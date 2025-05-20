@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{9CFB3883
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGame.GameBackend.Infra", "Infra\MyGame.GameBackend.Infra\MyGame.GameBackend.Infra.csproj", "{B03BE356-280F-4A5E-894E-EA08FC0FEEB4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{F583D487-17B8-4CF7-AB12-EB139C296B0F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{F583D487-17B8-4CF7-AB12-EB139C296B0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGame.GameBackend.Plugins", "Plugins\MyGame.GameBackend.Plugins\MyGame.GameBackend.Plugins.csproj", "{C846AED9-6160-4E42-8AC1-326DCACA7782}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGame.GameBackend.Modules", "Modules\MyGame.GameBackend.Modules\MyGame.GameBackend.Modules.csproj", "{C846AED9-6160-4E42-8AC1-326DCACA7782}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGame.Common", "..\Common\MyGame.Common\MyGame.Common.csproj", "{EAF96992-12DB-477F-BBE8-7215B5F0FF35}"
 EndProject
