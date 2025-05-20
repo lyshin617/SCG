@@ -1,4 +1,7 @@
 ﻿using Moq;
+using MyGame.GameBackend.App.Core.Messages;
+using MyGame.GameBackend.App.Core.Networks;
+using MyGame.GameBackend.App.Core.Networks.Interfaces;
 using System.Net;
 using System.Net.Sockets;
 
@@ -40,6 +43,7 @@ namespace MyGame.GameBackend.App.Core
             var envelope = new ProtocolEnvelope
             {
                 RequestId = "1",
+                MessageType = new MessageType(),
                 Payload = MemoryPack.MemoryPackSerializer.Serialize("hello world!")
             };
             // 包裝+發送
@@ -94,7 +98,7 @@ namespace MyGame.GameBackend.App.Core
             _transporter = new Transporter("127.0.0.1", 33335);
             var mockConn = new Mock<IClientConnection>();
             mockConn.SetupGet(c => c.Id).Returns("abc");
-            var envelope = new ProtocolEnvelope { Payload = new byte[0] };
+            var envelope = new ProtocolEnvelope { MessageType = new MessageType(), Payload = new byte[0] };
             mockConn.Setup(c => c.SendEnvelopeAsync(envelope)).Returns(Task.CompletedTask).Verifiable();
 
             _transporter.AddTestConnection(mockConn.Object);
@@ -113,7 +117,7 @@ namespace MyGame.GameBackend.App.Core
             mockConn1.SetupGet(c => c.Id).Returns("a1");
             mockConn2.SetupGet(c => c.Id).Returns("a2");
 
-            var envelope = new ProtocolEnvelope { Payload = new byte[0] };
+            var envelope = new ProtocolEnvelope { MessageType = new MessageType(), Payload = new byte[0] };
 
             mockConn1.Setup(c => c.SendEnvelopeAsync(envelope)).Returns(Task.CompletedTask).Verifiable();
             mockConn2.Setup(c => c.SendEnvelopeAsync(envelope)).Returns(Task.CompletedTask).Verifiable();

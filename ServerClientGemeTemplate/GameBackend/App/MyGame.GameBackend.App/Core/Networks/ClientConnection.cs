@@ -1,13 +1,17 @@
 ﻿using System.Net.Sockets;
 using System.Net;
+using MyGame.GameBackend.App.Core.Messages;
+using MyGame.GameBackend.App.Core.Models;
+using MyGame.GameBackend.App.Core.Networks.Interfaces;
 
-namespace MyGame.GameBackend.App.Core
+namespace MyGame.GameBackend.App.Core.Networks
 {
 
     public class ClientConnection : IDisposable, IClientConnection
     {
         private static int _idGen = 0;
         public string Id { get; }
+        public Session? Session { get; set; }
         private readonly Socket _socket;
 
         public EndPoint? RemoteEndPoint => _socket.RemoteEndPoint;

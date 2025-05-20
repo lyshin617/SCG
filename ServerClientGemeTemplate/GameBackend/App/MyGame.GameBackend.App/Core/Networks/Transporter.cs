@@ -1,8 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using MyGame.GameBackend.App.Core.Messages;
+using MyGame.GameBackend.App.Core.Networks.Interfaces;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 
-namespace MyGame.GameBackend.App.Core
+namespace MyGame.GameBackend.App.Core.Networks
 {
     public class Transporter
     {
