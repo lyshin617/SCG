@@ -8,15 +8,11 @@ namespace MyGame.GameBackend.App.Core.MessagesDispatchers
     public class Dispatcher
     {
         private readonly Dictionary<string, Func<MessageContext, Task<ProtocolEnvelope>>> _requestHandlers = new();
-        private readonly Dictionary<string, Action<MessageContext>> _responseHandlers = new();
         private readonly Dictionary<string, Action<MessageContext>> _eventHandlers = new();
 
 
         public void RegisterRequestHandler(string command, Func<MessageContext, Task<ProtocolEnvelope>> handler)
             => _requestHandlers[command] = handler;
-
-        public void RegisterResponseHandler(string command, Action<MessageContext> handler)
-            => _responseHandlers[command] = handler;
 
         public void RegisterEventHandler(string command, Action<MessageContext> handler)
             => _eventHandlers[command] = handler;
@@ -35,15 +31,6 @@ namespace MyGame.GameBackend.App.Core.MessagesDispatchers
                         return DispatchResult.Reply(response);
                     }
                     break;
-
-                case MessageKind.Response:
-                    if (_responseHandlers.TryGetValue(action, out var respHandler))
-                    {
-                        respHandler(ctx);
-                        return DispatchResult.NoReply(); // response 不需回覆
-                    }
-                    break;
-
                 case MessageKind.Event:
                     if (_eventHandlers.TryGetValue(action, out var eventHandler))
                     {

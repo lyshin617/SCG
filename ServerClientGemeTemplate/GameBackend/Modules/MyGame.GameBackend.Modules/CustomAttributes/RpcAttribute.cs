@@ -1,5 +1,4 @@
-﻿using MyGame.GameBackend.App.Core.Models;
-using System;
+﻿
 namespace MyGame.GameBackend.App.Core.CustomAttributes
 {
     [AttributeUsage(AttributeTargets.Method)]
@@ -7,12 +6,10 @@ namespace MyGame.GameBackend.App.Core.CustomAttributes
     {
         public string Action { get; }
         public RpcKind Kind { get; }
-        public RpcAttribute(string action) => Action = action;
+        public RpcAttribute(string action, RpcKind Kind) => Action = action;
     }
     public enum RpcKind
     {
-        None,
-        Request,
         Response,
         Event,
     }
