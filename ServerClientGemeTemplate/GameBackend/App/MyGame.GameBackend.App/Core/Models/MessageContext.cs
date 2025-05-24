@@ -14,10 +14,8 @@ namespace MyGame.GameBackend.App.Core.Messages
             Session = session;
         }
 
-        public TPayload GetPayload<TPayload>() 
-        {
-            return MemoryPackSerializer.Deserialize<TPayload>(Envelope.Payload);
-        }
+        public TPayload GetPayload<TPayload>()
+         => MemoryPackSerializer.Deserialize<TPayload>(Envelope.Payload) ?? throw new InvalidOperationException("Invalid payload");
     }
 
 }

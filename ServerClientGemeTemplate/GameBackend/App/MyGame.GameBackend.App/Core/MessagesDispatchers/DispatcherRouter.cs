@@ -5,11 +5,16 @@ namespace MyGame.GameBackend.App.Core.MessagesDispatchers
 {
     public class DispatcherRouter
     {
-        private readonly Dictionary<string, IDispatcher> _moduleDispatchers = new();
+        private readonly Dictionary<string, Dispatcher> _moduleDispatchers = new();
 
-        internal void RegisterDispatcher(string modulePrefix, IDispatcher dispatcher)
+        internal Dispatcher GetOrCreateModule(string moduleName)
         {
-            _moduleDispatchers[modulePrefix] = dispatcher;
+            if (!_moduleDispatchers.TryGetValue(moduleName, out var dispatcher))
+            {
+                dispatcher = new Dispatcher();
+                _moduleDispatchers[moduleName] = dispatcher;
+            }
+            return dispatcher;
         }
 
         public async Task<DispatchResult> RouteAsync(MessageContext ctx)

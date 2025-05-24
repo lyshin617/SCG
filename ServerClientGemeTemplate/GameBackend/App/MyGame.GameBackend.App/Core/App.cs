@@ -1,4 +1,5 @@
-﻿using MyGame.GameBackend.App.Core.Messages;
+﻿using MyGame.GameBackend.App.Core.CustomAttributes;
+using MyGame.GameBackend.App.Core.Messages;
 using MyGame.GameBackend.App.Core.MessagesDispatchers;
 using MyGame.GameBackend.App.Core.Networks;
 using MyGame.GameBackend.App.Core.Networks.Interfaces;
@@ -94,7 +95,7 @@ namespace MyGame.GameBackend.App.Core
         private void RegisterPlugins()
         {
             Assembly moduleAssembly = Assembly.LoadFrom("MyGame.GameBackend.Modules.dll");
-            ///AutoDispatcherRegister.RegisterAllRpcHandlers(_dispatcherRouter, moduleAssembly);
+            RpcHandlerRegistrar.RegisterAllHandlers(_dispatcherRouter, moduleAssembly);
         }
     }
 

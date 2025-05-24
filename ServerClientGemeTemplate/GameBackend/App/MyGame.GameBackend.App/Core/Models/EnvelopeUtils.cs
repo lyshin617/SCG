@@ -7,7 +7,7 @@ namespace MyGame.GameBackend.App.Core.Messages
     {
         public static ProtocolEnvelope CreateErrorResponse(ProtocolEnvelope request, Exception ex)
         {
-            return CreateErrorResponse(request, new ErrorResponse
+            return CreateResponse(request, new ErrorResponse
             {
                 Code = "ERR_UNHANDLED",
                 Message = ex.Message,
@@ -17,24 +17,38 @@ namespace MyGame.GameBackend.App.Core.Messages
 
         public static ProtocolEnvelope CreateErrorResponse(ProtocolEnvelope request, string message)
         {
-            return CreateErrorResponse(request, new ErrorResponse
+            return CreateResponse(request, new ErrorResponse
             {
                 Code = "ERR_GENERAL",
                 Message = message
             });
         }
 
-        private static ProtocolEnvelope CreateErrorResponse(ProtocolEnvelope request, ErrorResponse error)
+        public static ProtocolEnvelope CreateResponse<TResponse>(ProtocolEnvelope request, TResponse response) where TResponse : IMemoryPackable<TResponse>
         {
             return new ProtocolEnvelope
             {
                 Kind = MessageKind.Response,
-                MessageType = new MessageType
-                {
-                    Action = request.MessageType.Action
-                },
+                MessageType = request.MessageType,
                 RequestId = request.RequestId,
-                Payload = MemoryPackSerializer.Serialize(error)
+                Payload = MemoryPackSerializer.Serialize(response)
+            };
+        }
+        public static ProtocolEnvelope CreateResponse(ProtocolEnvelope request, object response, Type responseType)
+        {
+            var method = typeof(MemoryPackSerializer)
+                .GetMethods()
+                .First(m => m.Name == "Serialize" && m.IsGenericMethod)
+                .MakeGenericMethod(responseType);
+
+            var payload = (byte[])method.Invoke(null, new[] { response })!;
+
+            return new ProtocolEnvelope
+            {
+                Kind = MessageKind.Response,
+                MessageType = request.MessageType,
+                RequestId = request.RequestId,
+                Payload = payload
             };
         }
     }
