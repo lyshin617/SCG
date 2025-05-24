@@ -34,11 +34,6 @@ namespace MyGame.GameBackend.App.Core
 
             Console.WriteLine("[App] Started Game Server At 127.0.0.1:7777");
         }
-        public void Broadcast(ProtocolEnvelope envelope)
-        {
-            foreach (var processor in _processors.Values)
-                processor.Enqueue(envelope); // 或 SendAsync，如果你有送的權限
-        }
         public void OnUpdate(CancellationTokenSource cts)
         {
             Console.WriteLine("[App] Running...");

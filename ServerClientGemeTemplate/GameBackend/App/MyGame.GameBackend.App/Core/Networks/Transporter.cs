@@ -112,6 +112,19 @@ namespace MyGame.GameBackend.App.Core.Networks
             var tasks = _connections.Values.Select(conn => SendAsync(conn, envelope));
             await Task.WhenAll(tasks);
         }
+        public void Send(IClientConnection connection, ProtocolEnvelope envelope)
+        {
+            // 強制同步等待完成
+            connection.SendEnvelopeAsync(envelope).GetAwaiter().GetResult();
+        }
+
+        public void SendAll(ProtocolEnvelope envelope)
+        {
+            foreach (var conn in _connections.Values)
+            {
+                Send(conn, envelope);
+            }
+        }
 
 #if DEBUG
         public void AddTestConnection(IClientConnection conn)
