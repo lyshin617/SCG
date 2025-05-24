@@ -6,8 +6,14 @@ namespace MyGame.GameBackend.App.Core.CustomAttributes
     public class RpcAttribute : Attribute
     {
         public string Action { get; }
-        public MessageKind Kind { get; }
+        public RpcKind Kind { get; }
         public RpcAttribute(string action) => Action = action;
     }
-
+    public enum RpcKind
+    {
+        None,
+        Request,
+        Response,
+        Event,
+    }
 }

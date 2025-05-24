@@ -26,13 +26,12 @@ namespace MyGame.GameBackend.App.Core.CustomAttributes
 
                     switch (attr.Kind)
                     {
-                        case MessageKind.Request:
+                        case RpcKind.Response:
+                            // 標記為 Response 的 method，註冊成 Request handler
                             RegisterRequestHandler(dispatcher, attr.Action, instance, method);
                             break;
-                        case MessageKind.Response:
-                            RegisterResponseHandler(dispatcher, attr.Action, instance, method);
-                            break;
-                        case MessageKind.Event:
+                        case RpcKind.Event:
+                            // 標記為 Event 的 method，註冊成 Event handler
                             RegisterEventHandler(dispatcher, attr.Action, instance, method);
                             break;
                     }
@@ -64,17 +63,6 @@ namespace MyGame.GameBackend.App.Core.CustomAttributes
                 return EnvelopeUtils.CreateResponse(ctx.Envelope, result!, returnType);
             });
         }
-
-        private static void RegisterResponseHandler(Dispatcher dispatcher, string action, object target, MethodInfo method)
-        {
-            dispatcher.RegisterResponseHandler(action, ctx =>
-            {
-                var payloadType = method.GetParameters().First().ParameterType;
-                var payload = DeserializePayload(ctx.Envelope.Payload, payloadType);
-                method.Invoke(target, new[] { payload });
-            });
-        }
-
         private static void RegisterEventHandler(Dispatcher dispatcher, string action, object target, MethodInfo method)
         {
             dispatcher.RegisterEventHandler(action, ctx =>
