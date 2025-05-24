@@ -1,13 +1,11 @@
 ﻿using MemoryPack;
 using MyGame.GameBackend.App.Core.Models;
 using MyGame.GameBackend.App.Core.Messages;
-using MyGame.GameBackend.App.Core.MessagesDispatchers.Interfaces;
-using MyGame.GameBackend.App.Core.Networks.Interfaces;
-using System.Collections.Concurrent;
+
 
 namespace MyGame.GameBackend.App.Core.MessagesDispatchers
 {
-    public class Dispatcher : IDispatcher
+    public class Dispatcher
     {
         private readonly Dictionary<string, Func<MessageContext, Task<ProtocolEnvelope>>> _requestHandlers = new();
         private readonly Dictionary<string, Action<MessageContext>> _responseHandlers = new();

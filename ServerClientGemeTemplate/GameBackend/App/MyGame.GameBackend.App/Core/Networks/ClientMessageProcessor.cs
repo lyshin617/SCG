@@ -1,6 +1,5 @@
 ﻿using MyGame.GameBackend.App.Core.Messages;
 using MyGame.GameBackend.App.Core.Networks.Interfaces;
-using MyGame.GameBackend.App.Core.MessagesDispatchers.Interfaces;
 using System.Threading.Channels;
 using MyGame.GameBackend.App.Core.MessagesDispatchers;
 using MyGame.GameBackend.App.Core.Models;
