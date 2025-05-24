@@ -9,84 +9,55 @@ namespace MyGame.GameBackend.App.Core.MessagesDispatchers
 {
     public class Dispatcher : IDispatcher
     {
-        private readonly Dictionary<string, IRequestHandlerWrapper> _requestHandlers = new();
+        private readonly Dictionary<string, Func<MessageContext, Task<ProtocolEnvelope>>> _requestHandlers = new();
+        private readonly Dictionary<string, Action<MessageContext>> _responseHandlers = new();
+        private readonly Dictionary<string, Action<MessageContext>> _eventHandlers = new();
 
-        private readonly ConcurrentDictionary<string, TaskCompletionSource<ProtocolEnvelope>> _responseAwaiters = new();
 
-        public void RegisterRequestHandler<TRequest, TResponse>(string fullAction, Func<IClientConnection, TRequest, Task<TResponse>> handler)
-        {
-            _requestHandlers[fullAction] = new RequestHandlerWrapper<TRequest, TResponse>(handler);
-        }
+        public void RegisterRequestHandler(string command, Func<MessageContext, Task<ProtocolEnvelope>> handler)
+            => _requestHandlers[command] = handler;
 
-        public void RegisterRequestHandler<TRequest>(string fullAction, Func<IClientConnection, TRequest, Task> handler)
-        {
-            _requestHandlers[fullAction] = new RequestHandlerWrapper<TRequest>(handler);
-        }
-        internal void RegisterRequestHandler(string fullAction, IRequestHandlerWrapper wrapper)
-        {
-            _requestHandlers[fullAction] = wrapper;
-        }
+        public void RegisterResponseHandler(string command, Action<MessageContext> handler)
+            => _responseHandlers[command] = handler;
 
-        public async Task DispatchAsync(IClientConnection conn, ProtocolEnvelope envelope)
+        public void RegisterEventHandler(string command, Action<MessageContext> handler)
+            => _eventHandlers[command] = handler;
+
+        public async Task<DispatchResult> DispatchAsync(MessageContext ctx)
         {
-            if (envelope.Kind == MessageKind.Request &&
-                _requestHandlers.TryGetValue(envelope.MessageType.Action, out var wrapper))
+            var envelope = ctx.Envelope;
+            var action = envelope.MessageType.Action;
+
+            switch (envelope.Kind)
             {
-                await wrapper.HandleAsync(conn, envelope, this);
+                case MessageKind.Request:
+                    if (_requestHandlers.TryGetValue(action, out var reqHandler))
+                    {
+                        var response = await reqHandler(ctx);
+                        return DispatchResult.Reply(response);
+                    }
+                    break;
+
+                case MessageKind.Response:
+                    if (_responseHandlers.TryGetValue(action, out var respHandler))
+                    {
+                        respHandler(ctx);
+                        return DispatchResult.NoReply(); // response 不需回覆
+                    }
+                    break;
+
+                case MessageKind.Event:
+                    if (_eventHandlers.TryGetValue(action, out var eventHandler))
+                    {
+                        eventHandler(ctx);
+                        return DispatchResult.NoReply();
+                    }
+                    break;
             }
-            else if (envelope.Kind == MessageKind.Response &&
-                        !string.IsNullOrEmpty(envelope.RequestId) &&
-                        _responseAwaiters.TryRemove(envelope.RequestId, out var tcs))
-            {
-                tcs.SetResult(envelope);
-            }
+
+            return DispatchResult.Drop(); // 若無對應 handler
         }
-
-        public async Task<TResponse> SendRequestAsync<TRequest, TResponse>(IClientConnection conn, MessageType messageType, TRequest payload)
-        {
-            var requestId = Guid.NewGuid().ToString("N");
-            var envelope = new ProtocolEnvelope
-            {
-                Kind = MessageKind.Request,
-                MessageType = messageType,
-                RequestId = requestId,
-                Payload = MemoryPackSerializer.Serialize(payload)
-            };
-
-            var tcs = new TaskCompletionSource<ProtocolEnvelope>(TaskCreationOptions.RunContinuationsAsynchronously);
-            _responseAwaiters[requestId] = tcs;
-
-            await conn.SendEnvelopeAsync(envelope);
-            var responseEnvelope = await tcs.Task;
-
-            return MemoryPackSerializer.Deserialize<TResponse>(responseEnvelope.Payload)!;
-        }
-        public async Task SendRequestAsync<TRequest>(IClientConnection conn, MessageType messageType, TRequest payload)
-        {
-            var requestId = Guid.NewGuid().ToString("N");
-            var envelope = new ProtocolEnvelope
-            {
-                Kind = MessageKind.Request,
-                MessageType = messageType,
-                RequestId = requestId,
-                Payload = MemoryPackSerializer.Serialize(payload)
-            };
-
-            await conn.SendEnvelopeAsync(envelope);
-        }
-        public Task BroadcastRequestAsync<T>(IEnumerable<IClientConnection> targets, MessageType messageType, T payload)
-        {
-            var envelope = new ProtocolEnvelope
-            {
-                Kind = MessageKind.Request,
-                MessageType = messageType,
-                RequestId = null, // 不需回應
-                Payload = MemoryPackSerializer.Serialize(payload)
-            };
-
-            return Task.WhenAll(targets.Select(t => t.SendEnvelopeAsync(envelope)));
-        }
-
     }
+
 
 }

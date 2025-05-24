@@ -4,7 +4,6 @@
     {
         Request,
         Response,
-        Command,
         Event,
     }
 

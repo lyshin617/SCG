@@ -1,6 +1,5 @@
 ﻿using MyGame.GameBackend.App.Core.Messages;
 using MyGame.GameBackend.App.Core.MessagesDispatchers.Interfaces;
-using MyGame.GameBackend.App.Core.Networks.Interfaces;
 
 namespace MyGame.GameBackend.App.Core.MessagesDispatchers
 {
@@ -13,16 +12,15 @@ namespace MyGame.GameBackend.App.Core.MessagesDispatchers
             _moduleDispatchers[modulePrefix] = dispatcher;
         }
 
-        public async Task DispatchAsync(IClientConnection conn, ProtocolEnvelope envelope)
+        public async Task<DispatchResult> RouteAsync(MessageContext ctx)
         {
-            if (_moduleDispatchers.TryGetValue(envelope.MessageType.Module, out IDispatcher? dispatcher))
+            var moduleKey = ctx.Envelope.MessageType.Module;
+            if (_moduleDispatchers.TryGetValue(moduleKey, out var dispatcher))
             {
-                await dispatcher.DispatchAsync(conn, envelope);
+                return await dispatcher.DispatchAsync(ctx);
             }
-            else
-            {
-                Console.WriteLine($"[WARN] No dispatcher found for message type: {envelope.MessageType}");
-            }
+
+            return DispatchResult.Drop(); // 模組找不到就丟掉或回錯
         }
     }
 }

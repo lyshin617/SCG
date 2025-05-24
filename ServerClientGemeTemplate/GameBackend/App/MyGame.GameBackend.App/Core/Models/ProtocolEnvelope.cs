@@ -11,4 +11,5 @@ namespace MyGame.GameBackend.App.Core.Messages
         public string? RequestId { get; set; }
         public byte[]? Payload { get; set; }
     }
+
 }
