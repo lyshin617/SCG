@@ -42,7 +42,7 @@ namespace MyGame.GameBackend.App.Core.Networks
 
                         _connections.TryAdd(connection.Id, connection);
                         OnConnect?.Invoke(connection);
-
+                        //todo: Handle task
                         Task run = Task.Run(() => HandleClientAsync(connection, token), token);
                         
                     }
