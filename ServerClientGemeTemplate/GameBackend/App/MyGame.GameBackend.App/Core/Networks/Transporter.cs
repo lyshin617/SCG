@@ -114,17 +114,9 @@ namespace MyGame.GameBackend.App.Core.Networks
         }
         public void Send(IClientConnection connection, ProtocolEnvelope envelope)
         {
-            // 強制同步等待完成
-            connection.SendEnvelopeAsync(envelope).GetAwaiter().GetResult();
+            connection.SendEnvelope(envelope);
         }
 
-        public void SendAll(ProtocolEnvelope envelope)
-        {
-            foreach (var conn in _connections.Values)
-            {
-                Send(conn, envelope);
-            }
-        }
 
 #if DEBUG
         public void AddTestConnection(IClientConnection conn)

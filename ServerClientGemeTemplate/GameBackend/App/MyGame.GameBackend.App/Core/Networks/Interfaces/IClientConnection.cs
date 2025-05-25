@@ -13,5 +13,6 @@ namespace MyGame.GameBackend.App.Core.Networks.Interfaces
         void Dispose();
         Task<ProtocolEnvelope?> ReceiveEnvelopeAsync(CancellationToken token);
         Task SendEnvelopeAsync(ProtocolEnvelope envelope);
+        void SendEnvelope(ProtocolEnvelope envelope);
     }
 }

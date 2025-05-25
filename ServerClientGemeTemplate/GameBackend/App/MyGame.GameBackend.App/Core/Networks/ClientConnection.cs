@@ -46,6 +46,34 @@ namespace MyGame.GameBackend.App.Core.Networks
                 pool.Return(sendBuffer);
             }
         }
+        public void SendEnvelope(ProtocolEnvelope envelope)
+        {
+            // MemoryPack序列化
+            var data = MemoryPack.MemoryPackSerializer.Serialize(envelope);
+            int totalLen = 4 + data.Length;
+            var pool = System.Buffers.ArrayPool<byte>.Shared;
+            byte[] sendBuffer = pool.Rent(totalLen);
+            try
+            {
+                // 長度 prefix
+                BitConverter.GetBytes(data.Length).CopyTo(sendBuffer, 0);
+                // 序列化資料
+                Array.Copy(data, 0, sendBuffer, 4, data.Length);
+
+                int sent = 0;
+                while (sent < totalLen)
+                {
+                    int n = _socket.Send(sendBuffer, sent, totalLen - sent, SocketFlags.None);
+                    if (n <= 0)
+                        throw new SocketException((int)SocketError.ConnectionReset);
+                    sent += n;
+                }
+            }
+            finally
+            {
+                pool.Return(sendBuffer);
+            }
+        }
 
 
         // 接收封包（回傳一個封包，沒有的話回 null，斷線時亦回 null）
