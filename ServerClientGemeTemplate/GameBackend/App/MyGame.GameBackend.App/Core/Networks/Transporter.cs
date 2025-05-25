@@ -116,6 +116,18 @@ namespace MyGame.GameBackend.App.Core.Networks
         {
             connection.SendEnvelope(envelope);
         }
+        public void SendToMany(IEnumerable<IClientConnection> connections, ProtocolEnvelope envelope)
+        {
+            foreach (var conn in connections)
+            {
+                Send(conn, envelope); 
+            }
+        }
+        public async Task SendToManyAsync(IEnumerable<IClientConnection> connections, ProtocolEnvelope envelope)
+        {
+            var tasks = connections.Select(conn => conn.SendEnvelopeAsync(envelope));
+            await Task.WhenAll(tasks);
+        }
 
 
 #if DEBUG
